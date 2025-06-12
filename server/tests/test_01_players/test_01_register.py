@@ -3,6 +3,7 @@ from pages.player_pages.register_page import RegisterPage
 from selenium.common.exceptions import WebDriverException, TimeoutException
 import os
 from utils.helpers import take_screenshots
+from datetime import time
 
 def test_successful_registration(driver, user_credentials, logger):
     register_page = RegisterPage(driver, logger)
@@ -23,14 +24,33 @@ def test_successful_registration(driver, user_credentials, logger):
         error_msg = register_page.get_error_message()
 
         if success_msg:
-            take_screenshots(driver, "successfully_registred")
             logger.info(f"Received success message: {success_msg}")
-            register_page.logout()
-            take_screenshots(driver, "successfully_logout")
             assert success_msg
 
         else:
-            take_screenshots(driver, "failed_register")
+            logger.info(f"Received success message: {error_msg}")
+            assert error_msg
+
+    except (WebDriverException, TimeoutException) as e:
+        take_screenshots(driver, f"{str(e)}")
+        logger.error(f"Test failed: {str(e)}")
+        pytest.fail(f"Test failed due to: {str(e)}")
+
+def test_successful_logout(driver, logger):
+    register_page = RegisterPage(driver, logger)
+    try:
+        logger.info("Starting test_successful_logout")
+        
+        register_page.logout()
+
+        success_msg = register_page.get_success_message()
+        error_msg = register_page.get_error_message()
+
+        if success_msg:
+            logger.info(f"Received success message: {success_msg}")
+            assert success_msg
+
+        else:
             logger.info(f"Received success message: {error_msg}")
             assert error_msg
 
@@ -38,6 +58,7 @@ def test_successful_registration(driver, user_credentials, logger):
         take_screenshots(driver, "registration_failed")
         logger.error(f"Test failed: {str(e)}")
         pytest.fail(f"Test failed due to: {str(e)}")
+
 
 # def test_registration_with_existing_username(driver):
 #     register_page = RegisterPage(driver)

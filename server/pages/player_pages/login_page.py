@@ -4,6 +4,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from pages.base_page import BasePage
 from config.config import BASE_URL
 from selenium.common.exceptions import WebDriverException, TimeoutException
+from utils.helpers import take_screenshots
+import time
 
 class LoginPage(BasePage):
 
@@ -33,21 +35,19 @@ class LoginPage(BasePage):
             self.logger.error(f"Failed to load login modal at {BASE_URL}: {str(e)}")
             raise
 
-    def register(self, username, password):
+    def login(self, username, password):
         try:
             self.logger.info("Filling login form")
             self.enter_text(self.USERNAME_FIELD, username)
+            time.sleep(2)
             self.enter_text(self.PASSWORD_FIELD, password)
-
-            
-            # Check if login button is enabled
-            self.logger.info(f"login button enabled: {self.find_element(self.LOGIN_BUTTON).is_enabled()}")
+            time.sleep(2)
             # Wait for Register button to be clickable
             self.logger.info("Waiting for login button to be enabled")
             WebDriverWait(self.driver, 10).until(
                 EC.element_to_be_clickable(self.LOGIN_BUTTON)
             )
-            
+            take_screenshots(self.driver, f"login_form")
             self.logger.info("Submitting registration form")
             self.click(self.LOGIN_BUTTON)
         except TimeoutException as e:
@@ -57,6 +57,8 @@ class LoginPage(BasePage):
     def get_success_message(self):
         try:
             msg = self.get_text(self.SUCCESS_MESSAGE)
+            if msg:
+                take_screenshots(self.driver, f"{msg}")
             self.logger.info(f"Success message: {msg}")
             return msg
         except:
@@ -66,6 +68,8 @@ class LoginPage(BasePage):
     def get_error_message(self):
         try:
             msg = self.get_text(self.ERROR_MESSAGE)
+            if msg:
+                take_screenshots(self.driver, f"{msg}")
             self.logger.info(f"Error message: {msg}")
             return msg
         except:

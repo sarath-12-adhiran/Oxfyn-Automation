@@ -4,6 +4,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from pages.base_page import BasePage
 from config.config import BASE_URL
 from selenium.common.exceptions import WebDriverException, TimeoutException
+from utils.helpers import take_screenshots
+import time
 
 class RegisterPage(BasePage):
 
@@ -46,44 +48,45 @@ class RegisterPage(BasePage):
         try:
             self.logger.info("Filling registration form")
             self.enter_text(self.USERNAME_FIELD, username)
+            time.sleep(2)
             self.enter_text(self.PASSWORD_FIELD, password)
+            time.sleep(2)
             self.enter_text(self.CONFIRM_PASSWORD_FIELD, confirm_password)
             # self.enter_text(self.PROMO_CODE_FIELD, promo_code)
-            
+            time.sleep(2)
             # Click dropdown to open options
             self.logger.debug("Clicking country code dropdown")
             self.click(self.COUNTRY_CODE_DROPDOWN)
             # Select option by value
             dropdown_option = (By.XPATH, f"//li[@value='{country_code}']")
             self.click(dropdown_option)
-            
+            time.sleep(2)
             self.enter_text(self.MOBILE_NUMBER_FIELD, mobile_number)
-            
+            time.sleep(2)
             if age_confirm:
                 self.click(self.AGE_CHECKBOX)
-
+            time.sleep(2)
             if terms_agree:
                 self.click(self.TERMS_CHECKBOX)
-            
+            time.sleep(2)
             # Check if Register button is enabled
             self.logger.info(f"Register button enabled: {self.find_element(self.REGISTER_BUTTON).is_enabled()}")
             # Wait for Register button to be clickable
-            self.logger.info("Waiting for Register button to be enabled")
-            WebDriverWait(self.driver, 10).until(
-                EC.element_to_be_clickable(self.REGISTER_BUTTON)
-            )
-            
             self.logger.info("Submitting registration form")
+            take_screenshots(self.driver, "register_form")
             self.click(self.REGISTER_BUTTON)
 
-        except TimeoutException as e:
+        except (WebDriverException, TimeoutException) as e:
             self.logger.error(f"Failed to interact with registration form: {str(e)}")
             raise
 
     def logout(self):
         try:
             #trigger profiel button
+            time.sleep(2)
             self.click(self.PROFILE_BTN)
+            take_screenshots(self.driver, "profile_page")
+            time.sleep(2)
             self.click(self.LOGOUT_BTN)
         except TimeoutException as e:
             self.logger.error(f"Failed to logout: {str(e)}")
@@ -92,6 +95,8 @@ class RegisterPage(BasePage):
     def get_success_message(self):
         try:
             msg = self.get_text(self.SUCCESS_MESSAGE)
+            if msg:
+                take_screenshots(self.driver, f"{msg}")
             self.logger.info(f"Success message: {msg}")
             return msg
         except:
@@ -101,6 +106,8 @@ class RegisterPage(BasePage):
     def get_error_message(self):
         try:
             msg = self.get_text(self.ERROR_MESSAGE)
+            if msg:
+                take_screenshots(self.driver, f"{msg}")
             self.logger.info(f"Error message: {msg}")
             return msg
         except:
