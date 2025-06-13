@@ -2,9 +2,10 @@ from pages.base_page import BasePage
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from config.config import BACKEND_URL
+from config.config import BACKEND_BASE_URL
 from selenium.common.exceptions import WebDriverException, TimeoutException
 import time
+from utils.helpers import take_screenshots
 
 class BackendLoginPage(BasePage):
     def __init__(self, driver, logger):
@@ -20,12 +21,11 @@ class BackendLoginPage(BasePage):
 
     def navigate_to_backend_login(self):
         try:
-            self.logger.info(f"Navigating to {BACKEND_URL}")
-            self.driver.get(BACKEND_URL)
-
+            self.logger.info(f"Navigating to {BACKEND_BASE_URL}")
+            self.driver.get(BACKEND_BASE_URL)
             self.logger.info("successfully navigated to backend")
         except (WebDriverException, TimeoutException) as e:
-            self.logger.error(f"Failed to load backend {BACKEND_URL}: {str(e)}")
+            self.logger.error(f"Failed to load backend {BACKEND_BASE_URL}: {str(e)}")
             raise
 
     def backend_login(self, username, password, captcha):
@@ -35,11 +35,9 @@ class BackendLoginPage(BasePage):
 
             self.enter_text(self.USERNAME, username)
             self.enter_text(self.PASSWORD, password)
-            
-
             # Wait for login button to be clickable
-            time.sleep(5) 
-
+            time.sleep(10) 
+            take_screenshots(self.driver, "backend_login_page")
             self.click(self.LOGIN_BUTTON)
         except TimeoutException as e:
             self.logger.error(f"error to login: {str(e)}")
@@ -49,6 +47,7 @@ class BackendLoginPage(BasePage):
     def get_success_message(self):
         try:
             msg = self.get_text(self.SUCCESS_MESSAGE)
+            take_screenshots(self.driver, f"{msg}")
             self.logger.info(f"Success message: {msg}")
             return msg
         except:
@@ -58,6 +57,7 @@ class BackendLoginPage(BasePage):
     def get_error_message(self):
         try:
             msg = self.get_text(self.ERROR_MESSAGE)
+            take_screenshots(self.driver, f"{msg}")
             self.logger.info(f"Error message: {msg}")
             return msg
         except:

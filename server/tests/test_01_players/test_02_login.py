@@ -2,7 +2,6 @@ import pytest
 from pages.player_pages.login_page import LoginPage
 from pages.player_pages.deposit_page import DepositPage
 from selenium.common.exceptions import WebDriverException, TimeoutException
-from utils.helpers import take_screenshots
 
 def test_successful_login(driver, user_credentials, logger):
     login_page = LoginPage(driver, logger)
@@ -25,7 +24,6 @@ def test_successful_login(driver, user_credentials, logger):
             assert error_msg
 
     except (WebDriverException, TimeoutException) as e:
-        take_screenshots(driver, "loggedin_failed")
         logger.error(f"Test failed: {str(e)}")
         pytest.fail(f"Test failed due to: {str(e)}")
 

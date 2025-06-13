@@ -5,7 +5,8 @@ from pages.base_page import BasePage
 from config.config import DEPOSIT_PAGE
 from selenium.common.exceptions import WebDriverException, TimeoutException
 import os
-
+import time
+from utils.helpers import take_screenshots
 
 class DepositPage(BasePage):
 
@@ -40,10 +41,11 @@ class DepositPage(BasePage):
 
             # Locate the "Apply Code" button within the same slide
             apply_button = parent_slide.find_element(By.XPATH, ".//button[contains(text(), 'Apply Code')]")
-
+            time.sleep(2)
             self.click(apply_button)
             self.logger.info(f"Successfully clicked the 'Apply Code' button for coupon code {coupon_code}")
             
+            time.sleep(2)
             # Try primary locator
             self.enter_text(self.UTR_NUMBER, utr_number)
             self.logger.info(f"Successfully entered UTR number {utr_number}")
@@ -60,22 +62,25 @@ class DepositPage(BasePage):
 
             # Unhide the file input
             self.driver.execute_script("arguments[0].style.display = 'block';", file_input)
-
+            time.sleep(2)
             # Send file path to input
             file_input.send_keys(file_path)
             self.logger.info(f"Successfully uploaded image from {file_path}")
+            time.sleep(2)
 
+            take_screenshots(self.driver, "deposit_page")
             # Submit the form
             self.click(self.SUBMIT_BTN)
 
             #enter utr number
-        except TimeoutException as e:
+        except (WebDriverException, TimeoutException) as e:
             self.logger.error(f"Failed to intract with deposit form: {str(e)}")
             raise   
             
     def get_success_message(self):
         try:
             msg = self.get_text(self.SUCCESS_MESSAGE)
+            take_screenshots(self.driver, f"{msg}")
             self.logger.info(f"Success message: {msg}")
             return msg
         except:
@@ -85,6 +90,7 @@ class DepositPage(BasePage):
     def get_error_message(self):
         try:
             msg = self.get_text(self.ERROR_MESSAGE)
+            take_screenshots(self.driver, f"{msg}")
             self.logger.info(f"Error message: {msg}")
             return msg
         except:

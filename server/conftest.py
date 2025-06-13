@@ -6,7 +6,6 @@ from datetime import datetime
 from logging.handlers import RotatingFileHandler
 from logging import Formatter
 from utils.helpers import generate_username, generate_mobile_number, generate_utr
-import keyboard
 from selenium.common.exceptions import WebDriverException
 
 @pytest.fixture(scope="session")
@@ -78,7 +77,7 @@ def coupon_code():
 
 @pytest.fixture(scope="session")
 def file_screenshot():
-    file_path = r"D:\pytest\server\static\prof.png"
+    file_path = r"C:\Users\sujit\OneDrive\Documents\GitHub\Oxfyn-Automation\server\static\prof.png"
     return file_path
 
 @pytest.fixture(scope="session")

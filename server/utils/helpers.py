@@ -3,6 +3,7 @@ import string
 import os
 from datetime import date
 
+
 def generate_username(length=4):
     random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=length))
     return f'Atester{random_string}'
@@ -24,3 +25,5 @@ def take_screenshots(driver, filename):
         os.mkdir("screenshots")
     today_date = date.today()
     driver.save_screenshot(f"screenshots/{today_date}_{filename}.png")
+
+

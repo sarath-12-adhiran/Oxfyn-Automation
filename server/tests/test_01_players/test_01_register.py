@@ -55,7 +55,6 @@ def test_successful_logout(driver, logger):
             assert error_msg
 
     except (WebDriverException, TimeoutException) as e:
-        take_screenshots(driver, "registration_failed")
         logger.error(f"Test failed: {str(e)}")
         pytest.fail(f"Test failed due to: {str(e)}")
 

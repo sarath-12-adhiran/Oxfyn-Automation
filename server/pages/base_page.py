@@ -6,17 +6,22 @@ class BasePage:
     def __init__(self, driver):
         self.driver = driver
 
-    def find_element(self, locator, seconds=30):
+    def find_element(self, locator, seconds=10):
         return WebDriverWait(self.driver, seconds).until(
             EC.visibility_of_element_located(locator)
         )
 
-    def click(self, locator, seconds=30):
+    def click(self, locator, seconds=10):
         element = WebDriverWait(self.driver, seconds).until(
             EC.element_to_be_clickable(locator)
         )
         element.click()
 
+    def wait(self, locator, seconds=10):
+        WebDriverWait(self.driver, seconds).until(
+            EC.presence_of_element_located(locator)
+        )
+        
     def enter_text(self, locator, text):
         element = self.find_element(locator)
         element.clear()
@@ -28,4 +33,4 @@ class BasePage:
     def select_dropdown_by_value(self, locator, value):
         element = self.find_element(locator)
         Select(element).select_by_value(value)
-  
+    

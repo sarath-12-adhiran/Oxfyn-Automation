@@ -5,6 +5,7 @@ from config.config import IMPLICIT_WAIT
 
 def setup_driver():
     options = webdriver.ChromeOptions()
+    options.add_argument("--log-level=3")
     options.add_argument("--ignore-certificate-errors")  # Bypass SSL errors
     options.add_argument("--disable-web-security")      # Disable web security for testing
     options.add_argument("--allow-running-insecure-content")  # Allow insecure content

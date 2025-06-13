@@ -2,7 +2,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from pages.base_page import BasePage
-from config.config import BASE_URL
+from config.config import PLAYER_BASE_URL
 from selenium.common.exceptions import WebDriverException, TimeoutException
 from utils.helpers import take_screenshots
 import time
@@ -35,13 +35,13 @@ class RegisterPage(BasePage):
 
     def navigate_to_register(self):
         try:
-            self.logger.info(f"Navigating to {BASE_URL}")
-            self.driver.get(BASE_URL)
+            self.logger.info(f"Navigating to {PLAYER_BASE_URL}")
+            self.driver.get(PLAYER_BASE_URL)
             self.logger.info("Attempting to trigger registration modal")
             self.click(self.REGISTER_MODAL_BUTTON)
             self.logger.info("Registration modal loaded successfully")
         except (WebDriverException, TimeoutException) as e:
-            self.logger.error(f"Failed to load registration modal at {BASE_URL}: {str(e)}")
+            self.logger.error(f"Failed to load registration modal at {PLAYER_BASE_URL}: {str(e)}")
             raise
 
     def register(self, username, password, confirm_password, country_code, mobile_number, age_confirm=True, terms_agree=True):

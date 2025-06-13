@@ -2,7 +2,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from pages.base_page import BasePage
-from config.config import BASE_URL
+from config.config import PLAYER_BASE_URL
 from selenium.common.exceptions import WebDriverException, TimeoutException
 from utils.helpers import take_screenshots
 import time
@@ -26,8 +26,8 @@ class LoginPage(BasePage):
 
     def navigate_to_login(self):
         try:
-            self.logger.info(f"Navigating to {BASE_URL}")
-            self.driver.get(BASE_URL)
+            self.logger.info(f"Navigating to {PLAYER_BASE_URL}")
+            self.driver.get(PLAYER_BASE_URL)
             self.logger.info("Attempting to trigger login modal")
             self.click(self.LOGIN_MODAL_BUTTON)
             self.logger.info("login modal loaded successfully")
