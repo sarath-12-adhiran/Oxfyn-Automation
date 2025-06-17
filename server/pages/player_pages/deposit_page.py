@@ -23,6 +23,7 @@ class DepositPage(BasePage):
     ERROR_MESSAGE = (By.CSS_SELECTOR, ".Toastify__toast--error")
     SWIPER_SLIDES = (By.CLASS_NAME, "swiper-slide")
 
+    
     def trigger_deposit_btn(self):
         #Trigger Desposit button
         self.logger.info("triggering deposit button.")

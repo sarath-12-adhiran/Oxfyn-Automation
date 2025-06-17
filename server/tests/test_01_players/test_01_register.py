@@ -2,7 +2,6 @@ import pytest
 from pages.player_pages.register_page import RegisterPage
 from selenium.common.exceptions import WebDriverException, TimeoutException
 import os
-from utils.helpers import take_screenshots
 from datetime import time
 
 def test_successful_registration(driver, user_credentials, logger):
@@ -32,7 +31,6 @@ def test_successful_registration(driver, user_credentials, logger):
             assert error_msg
 
     except (WebDriverException, TimeoutException) as e:
-        take_screenshots(driver, f"{str(e)}")
         logger.error(f"Test failed: {str(e)}")
         pytest.fail(f"Test failed due to: {str(e)}")
 

@@ -32,7 +32,7 @@ class LoginPage(BasePage):
             self.click(self.LOGIN_MODAL_BUTTON)
             self.logger.info("login modal loaded successfully")
         except (WebDriverException, TimeoutException) as e:
-            self.logger.error(f"Failed to load login modal at {BASE_URL}: {str(e)}")
+            self.logger.error(f"Failed to load login modal at {PLAYER_BASE_URL}: {str(e)}")
             raise
 
     def login(self, username, password):

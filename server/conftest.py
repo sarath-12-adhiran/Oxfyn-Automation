@@ -92,3 +92,17 @@ def brand_name():
     names = ["BET DUNIYA"]
     return names
 
+@pytest.fixture(scope="session")
+def verticals():
+    name = "casino"
+    return name
+
+@pytest.fixture(scope="session")
+def lobby():
+    name = "Casino"
+    return name
+
+@pytest.fixture(scope="session")
+def game_name():
+    name = "Wolf Gold"
+    return name

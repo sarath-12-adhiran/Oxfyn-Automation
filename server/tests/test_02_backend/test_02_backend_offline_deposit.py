@@ -36,8 +36,8 @@ def test_successfull_backend_logout(driver, logger):
 
     try:
         backend.logout()
-        backend.navigate_player_dashboard()
-
+        res = backend.navigate_player_dashboard()
+        logger.info(f"deposit amount********************{res}")
     except (WebDriverException, TimeoutException) as e:
         logger.error(f"Test failed: {str(e)}")
         pytest.fail(f"Test failed due to: {str(e)}")

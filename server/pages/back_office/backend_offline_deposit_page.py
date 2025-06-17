@@ -34,6 +34,9 @@ class BackendOfflineDepositPage(BasePage):
 
     REFRESH_BUTTON = (By.CSS_SELECTOR, ".css-takimu")
     
+    DEPOSIT_AMOUNT = (By.CSS_SELECTOR, ".css-9a5a2q")
+
+
     def trigger_offile_deposit_button(self):
         try:
             self.logger.info(f"Triggering to offile deposit button")
@@ -173,8 +176,11 @@ class BackendOfflineDepositPage(BasePage):
 
             time.sleep(20)
             self.wait(self.REFRESH_BUTTON, seconds=40)
-
+            
+            deposit_amount = self.find_element(self.DEPOSIT_AMOUNT).text
             take_screenshots(self.driver, "deposited")
+            return deposit_amount
+            
         except Exception as e:
             self.logger.error(f"Failed to navigate {PLAYER_BASE_URL}: {str(e)}")
             raise 
