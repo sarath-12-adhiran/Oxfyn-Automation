@@ -3,6 +3,7 @@ from pages.back_office.backend_offline_deposit_page import BackendOfflineDeposit
 from selenium.common.exceptions import WebDriverException, TimeoutException
 import os
 from pages.player_pages.login_page import LoginPage
+from pages.player_pages.deposit_page import DepositPage
 
 def test_successful_backend_offline_deposit(driver, user_credentials, logger, utr_number, brand_name):
     backend_offline_deposit = BackendOfflineDepositPage(driver, logger)
@@ -36,9 +37,23 @@ def test_successfull_backend_logout(driver, logger):
 
     try:
         backend.logout()
-        res = backend.navigate_player_dashboard()
-        logger.info(f"deposit amount********************{res}")
+        backend.navigate_player_dashboard()
+        
     except (WebDriverException, TimeoutException) as e:
         logger.error(f"Test failed: {str(e)}")
         pytest.fail(f"Test failed due to: {str(e)}")
 
+def test_verifying_deposit(driver, logger):
+    player_page =  DepositPage(driver, logger)
+
+    try:
+        response = player_page.verify_deposit()
+
+        if not "600.00" in response:
+            logger.error("the deposit amount was not found or invalid")
+    
+        assert "600.00" in response
+
+    except (WebDriverException, TimeoutException) as e:
+        logger.error(f"Test failed: {str(e)}")
+        pytest.fail(f"Test failed due to: {str(e)}")

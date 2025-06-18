@@ -6,6 +6,7 @@ from config.config import PLAYER_BASE_URL
 from selenium.common.exceptions import WebDriverException, TimeoutException
 import time
 from utils.helpers import take_screenshots
+import re
 
 class BackendOfflineDepositPage(BasePage):
     def __init__(self, driver, logger):
@@ -31,10 +32,6 @@ class BackendOfflineDepositPage(BasePage):
     PROFILE = (By.CSS_SELECTOR, '.css-196w96x')
 
     LOGOUT_BUTTON = (By.XPATH, "//ul[@role='menu']//li[p[normalize-space()='Logout']]")
-
-    REFRESH_BUTTON = (By.CSS_SELECTOR, ".css-takimu")
-    
-    DEPOSIT_AMOUNT = (By.CSS_SELECTOR, ".css-9a5a2q")
 
 
     def trigger_offile_deposit_button(self):
@@ -170,21 +167,16 @@ class BackendOfflineDepositPage(BasePage):
             raise
 
     def navigate_player_dashboard(self):
+        deposit_amount = None
         try:
             self.logger.info(f"Navigating to {PLAYER_BASE_URL}")
             self.driver.get(PLAYER_BASE_URL)
+            
+        except (WebDriverException, TimeoutException) as e:
+            self.logger.error(f"error to navigate player dashboard: {str(e)}")
+            raise
+        return deposit_amount
 
-            time.sleep(20)
-            self.wait(self.REFRESH_BUTTON, seconds=40)
-            
-            deposit_amount = self.find_element(self.DEPOSIT_AMOUNT).text
-            take_screenshots(self.driver, "deposited")
-            return deposit_amount
-            
-        except Exception as e:
-            self.logger.error(f"Failed to navigate {PLAYER_BASE_URL}: {str(e)}")
-            raise 
-        
     def get_success_message(self):
         try:
             msg = self.get_text(self.SUCCESS_MESSAGE)

@@ -21,13 +21,11 @@ def test_successful_registration(driver, user_credentials, logger):
         success_msg = register_page.get_success_message()
         error_msg = register_page.get_error_message()
 
-        if success_msg:
-            logger.info(f"Received success message: {success_msg}")
-            assert success_msg
+        
+        if not "Registered Successfully" in success_msg:
+            logger.error(f"test failed dude to unexpected response error message: {error_msg}")
 
-        else:
-            logger.info(f"Received success message: {error_msg}")
-            assert error_msg
+        assert "Registered Successfully" in success_msg
 
     except (WebDriverException, TimeoutException) as e:
         logger.error(f"Test failed: {str(e)}")

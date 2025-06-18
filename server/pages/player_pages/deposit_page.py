@@ -7,6 +7,7 @@ from selenium.common.exceptions import WebDriverException, TimeoutException
 import os
 import time
 from utils.helpers import take_screenshots
+import re
 
 class DepositPage(BasePage):
 
@@ -22,7 +23,9 @@ class DepositPage(BasePage):
     SUCCESS_MESSAGE = (By.CSS_SELECTOR, ".Toastify__toast--success")
     ERROR_MESSAGE = (By.CSS_SELECTOR, ".Toastify__toast--error")
     SWIPER_SLIDES = (By.CLASS_NAME, "swiper-slide")
-
+    REFRESH_BUTTON = (By.CSS_SELECTOR, ".css-takimu")
+    
+    DEPOSIT_AMOUNT = (By.XPATH, "//p[text()='Balance']/following-sibling::p[1]")
     
     def trigger_deposit_btn(self):
         #Trigger Desposit button
@@ -77,7 +80,26 @@ class DepositPage(BasePage):
         except (WebDriverException, TimeoutException) as e:
             self.logger.error(f"Failed to intract with deposit form: {str(e)}")
             raise   
+    
+    def verify_deposit(self):
+        deposit_amount = None
+        try:
+            time.sleep(2)
+            self.wait(self.REFRESH_BUTTON, seconds=20)
             
+            deposit_amount = self.find_element(self.DEPOSIT_AMOUNT)
+            if not deposit_amount:
+                self.logger.info("deposit element not found")
+                
+            take_screenshots(self.driver, "deposited")
+            amount = deposit_amount.text.strip()
+            deposit_amount = re.sub(r'[^\d.]', '', amount)
+        
+        except (WebDriverException, TimeoutException) as e:
+            self.logger.error(f"Failed to intract with deposit form: {str(e)}")
+            raise   
+        return deposit_amount
+
     def get_success_message(self):
         try:
             msg = self.get_text(self.SUCCESS_MESSAGE)
