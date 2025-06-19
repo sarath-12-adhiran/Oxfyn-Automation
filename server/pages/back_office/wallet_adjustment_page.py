@@ -24,6 +24,16 @@ class WalletAdjustmentPage(BasePage):
     WALLET_BTN = (By.XPATH, '//a[@href="/wallet"]')
     MONEY = (By.XPATH, ".//div[starts-with(@class, 'MuiBox-root')]")
 
+    BRAND = (By.CSS_SELECTOR, "div[aria-labelledby='brand-select-label']")
+    PLAYER_NAME = (By.XPATH, "//label[text()='Player Name']/following::input[1]")
+    AMOUNT = (By.XPATH, "//label[text()='Amount']/following::input[1]")
+    ADJUSTMENT_DROPDOWN = (By.XPATH,"//div[@role='combobox' and @id='adjustmenttype']")
+    WALLET_DROPDOWN = (By.XPATH, "//div[@role='combobox' and @id='walletType']")
+    POCKET_DROPDOWN = (By.XPATH, "//div[@role='combobox' and @id='pockettype']")
+
+    ADJUST_BUTTON = (By.XPATH, "//button[normalize-space()='Adjust']")
+    SUCCESS_MESSAGE = (By.CSS_SELECTOR, ".Toastify__toast--success")
+    ERROR_MESSAGE = (By.CSS_SELECTOR, ".Toastify__toast--error")
     def click_wallet_adjustment_button(self):
         try:
             if not self.find_element(self.WALLET_ADJUSTMENT):
@@ -56,7 +66,6 @@ class WalletAdjustmentPage(BasePage):
             time.sleep(2)
             self.wait(self.UPLOAD_BUTTON, seconds=30)
             self.click(self.UPLOAD_BUTTON)
-
         except (WebDriverException,TimeoutException) as e:
             self.logger.error(f"some error occured: {str(e)}")
 
@@ -74,15 +83,15 @@ class WalletAdjustmentPage(BasePage):
             self.wait(self.WALLET_BTN,seconds=30)
             self.click(self.WALLET_BTN)
 
-            time.sleep(5)
+            time.sleep(2)
             # Find the container element first
             container = self.driver.find_element(By.CSS_SELECTOR, ".css-f9ihvp")
             self.driver.execute_script("arguments[0].scrollIntoView();", container)
             # Find all sub-boxes with class starting with 'css-1niqfd2' or 'css-1ks1ssp'
-            time.sleep(5)
+            time.sleep(2)
             boxes = container.find_elements(By.XPATH, ".//div[starts-with(@class, 'MuiBox-root')]")
             self.logger.info("boxes founded")
-            time.sleep(5)
+            time.sleep(2)
 
             for i, block in enumerate(boxes):
                 para = block.find_elements(By.TAG_NAME, "p")
@@ -99,7 +108,7 @@ class WalletAdjustmentPage(BasePage):
                     # Remove currency symbol and commas (e.g., ₹1,000.00 -> 1000.00)
                     value = re.sub(r'[^\d.]', '', value_text)
 
-                    self.logger.info(f"[{i}] Extracted -> label: {label}, raw value: {value_text}, cleaned value: {value}")
+                    # self.logger.info(f"[{i}] Extracted -> label: {label}, raw value: {value_text}, cleaned value: {value}")
                     amount.append({"label": label, "value": value})
                     take_screenshots(self.driver, f"wallet")
                 except Exception as e:
@@ -110,15 +119,57 @@ class WalletAdjustmentPage(BasePage):
             self.logger.error(f"some error occured: {str(e)}")
         return amount if amount else []
 
+    def wallet_adjustment_for_win(self, brand_name, player_name, amount, adjustment_type, wallet_type, pocket_type):
+        try:
+            time.sleep(2)
+            self.click(self.BRAND)
+        
+            BRAND_TYPE = self.find_element((By.XPATH, f"//ul[@role='listbox']//li[text()='{brand_name}']"))
+            BRAND_TYPE.click()
+            
+            self.enter_text(self.PLAYER_NAME, player_name)
+
+            time.sleep(2)
+            PLAYER_OPTION = self.find_element((By.XPATH, f"//li[text()='{player_name}']"))
+            PLAYER_OPTION.click()
+
+            time.sleep(2)
+            self.enter_text(self.AMOUNT, amount)
+
+            time.sleep(2)
+            self.click(self.ADJUSTMENT_DROPDOWN)
+
+            time.sleep(2)
+            ADJUSTMENT_TYPE = self.find_element((By.XPATH, f"//ul[@role='listbox']//li[text()='{adjustment_type}']"))
+            ADJUSTMENT_TYPE.click()
+
+            time.sleep(2)
+            self.click(self.WALLET_DROPDOWN)
+            WALLET_TYPE = self.find_element((By.XPATH, f"//ul[@role='listbox']//li[text()='{wallet_type}']"))
+            WALLET_TYPE.click()
+
+            time.sleep(2)
+            self.click(self.POCKET_DROPDOWN)
+            POCKET_TYPE = self.find_element((By.XPATH, f"//ul[@role='listbox']//li[text()='{pocket_type}']"))
+            POCKET_TYPE.click()
+
+            time.sleep(2)
+            self.wait(self.ADJUST_BUTTON)
+            self.click(self.ADJUST_BUTTON)
+    
+        except (WebDriverException,TimeoutException) as e:
+            self.logger.error(f"some error occured: {str(e)}")
+            raise
+
     def get_success_message(self):
         try:
             msg = self.get_text(self.SUCCESS_MESSAGE)
             take_screenshots(self.driver, f"{msg}")
             self.logger.info(f"Success message: {msg}")
             return msg
-        except:
-            self.logger.warning("Success message not found")
-            return "Unable to get the message"
+        except (WebDriverException,TimeoutException) as e:
+            self.logger.error(f"unable to get success message: {str(e)}")
+            raise
 
     def get_error_message(self):
         try:
@@ -126,8 +177,6 @@ class WalletAdjustmentPage(BasePage):
             take_screenshots(self.driver, f"{msg}")
             self.logger.info(f"Error message: {msg}")
             return msg
-        except:
-            self.logger.warning("Error message not found")
-            return "Unable to get the message"
-
-    
+        except (WebDriverException,TimeoutException) as e:
+            self.logger.error(f"unable to get error: {str(e)}")
+            raise

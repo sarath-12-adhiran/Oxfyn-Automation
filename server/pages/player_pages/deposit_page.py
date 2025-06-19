@@ -106,9 +106,9 @@ class DepositPage(BasePage):
             take_screenshots(self.driver, f"{msg}")
             self.logger.info(f"Success message: {msg}")
             return msg
-        except:
-            self.logger.warning("Success message not found")
-            return "Unable to get the message"
+        except (WebDriverException,TimeoutException) as e:
+            self.logger.error(f"unable to get success message: {str(e)}")
+            raise
 
     def get_error_message(self):
         try:
@@ -116,10 +116,7 @@ class DepositPage(BasePage):
             take_screenshots(self.driver, f"{msg}")
             self.logger.info(f"Error message: {msg}")
             return msg
-        except:
-            self.logger.warning("Error message not found")
-            return "Unable to get the message"
-
-    
-
+        except (WebDriverException,TimeoutException) as e:
+            self.logger.error(f"unable to get error message: {str(e)}")
+            raise
     

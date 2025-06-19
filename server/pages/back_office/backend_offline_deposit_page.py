@@ -28,7 +28,7 @@ class BackendOfflineDepositPage(BasePage):
     UPDATE_BUTTON = (By.CSS_SELECTOR, ".css-176id20")
 
     DIALOG_BOX = (By.XPATH, "//div[@role='dialog']//button[normalize-space()='OK']")
-
+    DIALOG_MESSAGE = (By.XPATH, "//div[text()='Deposit transaction Updated Successfully']")
     PROFILE = (By.CSS_SELECTOR, '.css-196w96x')
 
     LOGOUT_BUTTON = (By.XPATH, "//ul[@role='menu']//li[p[normalize-space()='Logout']]")
@@ -44,7 +44,7 @@ class BackendOfflineDepositPage(BasePage):
             raise
 
     def accept_income_deposit_request(self, username, utr_number, brand_name, payment_status, comment):
-        
+        success_message = None
         try:
             time.sleep(10)
             # Locate the input field of the Autocomplete
@@ -146,14 +146,15 @@ class BackendOfflineDepositPage(BasePage):
 
             time.sleep(2)
             self.wait(self.DIALOG_BOX, seconds=30)
-            take_screenshots(self.driver, "offline_deposit_dialog_box")
+            success_message = self.get_text(self.DIALOG_MESSAGE)
+            take_screenshots(self.driver, f"{success_message}")
             self.click(self.DIALOG_BOX)
-
-            self.logger.info("successfully updated")
+            return success_message
+            
         except (WebDriverException, TimeoutException) as e:
             self.logger.error(f"error to load offline deposit: {str(e)}")
             raise
-        
+
     def logout(self):
         try:
             time.sleep(2)
@@ -183,9 +184,9 @@ class BackendOfflineDepositPage(BasePage):
             take_screenshots(self.driver, f"{msg}")
             self.logger.info(f"Success message: {msg}")
             return msg
-        except:
-            self.logger.warning("Success message not found")
-            return "Unable to get the message"
+        except (WebDriverException,TimeoutException) as e:
+            self.logger.error(f"unable to get success message: {str(e)}")
+            raise
 
     def get_error_message(self):
         try:
@@ -193,8 +194,6 @@ class BackendOfflineDepositPage(BasePage):
             take_screenshots(self.driver, f"{msg}")
             self.logger.info(f"Error message: {msg}")
             return msg
-        except:
-            self.logger.warning("Error message not found")
-            return "Unable to get the message"
-
-    
+        except (WebDriverException,TimeoutException) as e:
+            self.logger.error(f"unable to get error message: {str(e)}")
+            raise

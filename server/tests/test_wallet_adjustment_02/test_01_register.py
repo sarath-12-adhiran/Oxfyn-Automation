@@ -19,10 +19,10 @@ def test_successful_registration(driver, user_credentials, logger):
             terms_agree=True
         )
         success_msg = register_page.get_success_message()
-        error_msg = register_page.get_error_message()
 
         
         if not "Registered Successfully" in success_msg:
+            error_msg = register_page.get_error_message()
             logger.error(f"test failed dude to unexpected response error message: {error_msg}")
 
         assert "Registered Successfully" in success_msg

@@ -20,15 +20,12 @@ def test_successful_registration(driver, user_credentials, logger):
             terms_agree=True
         )
         success_msg = register_page.get_success_message()
-        error_msg = register_page.get_error_message()
 
-        if success_msg:
-            logger.info(f"Received success message: {success_msg}")
-            assert success_msg
+        if not "Registered Successfully" in success_msg:
+            error_msg = register_page.get_error_message()
+            logger.error(f"unable to register some error occured: {error_msg}")
 
-        else:
-            logger.info(f"Received success message: {error_msg}")
-            assert error_msg
+        assert "Registered Successfully" in success_msg
 
     except (WebDriverException, TimeoutException) as e:
         logger.error(f"Test failed: {str(e)}")
@@ -42,15 +39,12 @@ def test_successful_logout(driver, logger):
         register_page.logout()
 
         success_msg = register_page.get_success_message()
-        error_msg = register_page.get_error_message()
 
-        if success_msg:
-            logger.info(f"Received success message: {success_msg}")
-            assert success_msg
-
-        else:
-            logger.info(f"Received success message: {error_msg}")
-            assert error_msg
+        if not "Logout successful" in success_msg:
+            error_msg = register_page.get_error_message()
+            logger.error(f"unabel to logout some error occured: {error_msg}")
+        
+        assert "Logout successful" in success_msg
 
     except (WebDriverException, TimeoutException) as e:
         logger.error(f"Test failed: {str(e)}")

@@ -13,14 +13,13 @@ def test_successful_backend_login(driver, admin_credentials, logger):
             captcha=True
         )
         success_msg = backend_login.get_success_message()
-        error_msg = backend_login.get_error_message()
 
-        if success_msg:
-            logger.info(f"Received success message: {success_msg}")
-            assert success_msg
-        else:
-            logger.info(f"Received error message: {error_msg}")
-            assert error_msg
+        if not "Login successful" in success_msg:
+            error_msg = backend_login.get_error_message()
+            logger.error("unable to login some error occured: {error_msg}")
+
+        assert "Login successful" in success_msg
+
     except (WebDriverException, TimeoutException) as e:
         logger.error(f"Test failed: {str(e)}")
         pytest.fail(f"Test failed due to: {str(e)}")

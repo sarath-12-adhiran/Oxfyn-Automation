@@ -14,14 +14,12 @@ def test_successful_login(driver, user_credentials, logger):
 
         )
         success_msg = login_page.get_success_message()
-        error_msg = login_page.get_error_message()
 
-        if success_msg:
-            logger.info(f"Received success message: {success_msg}")
-            assert success_msg
-        else:
-            logger.info(f"Received error message: {error_msg}")
-            assert error_msg
+        if not "Login successful" in success_msg:
+            error_msg = login_page.get_error_message()
+            logger.error(f"unable to login some error occured: {error_msg}")
+
+        assert "Login successful" in success_msg
 
     except (WebDriverException, TimeoutException) as e:
         logger.error(f"Test failed: {str(e)}")

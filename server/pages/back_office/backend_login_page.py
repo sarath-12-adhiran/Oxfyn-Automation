@@ -53,7 +53,7 @@ class BackendLoginPage(BasePage):
         except:
             self.logger.warning("Success message not found")
             return "Unable to get the message"
-
+        
     def get_error_message(self):
         try:
             msg = self.get_text(self.ERROR_MESSAGE)
