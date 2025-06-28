@@ -1,13 +1,10 @@
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from pages.base_page import BasePage
-from config.config import DEPOSIT_PAGE
 from selenium.common.exceptions import WebDriverException, TimeoutException
 import os
-import time
 from utils.helpers import take_screenshots
 import re
+import time
 
 class DepositPage(BasePage):
 
@@ -15,41 +12,57 @@ class DepositPage(BasePage):
         self.logger = logger
         self.driver = driver
     
-    DEPOSIT_BUTTON = (By.CSS_SELECTOR, ".css-rdb04b")
-    AMOUNT_BUTTONS = (By.CSS_SELECTOR, ".css-1eikg3m")
-    UTR_NUMBER = (By.XPATH, "//p[text()='Enter UTR Number']/following::input[1]")
-    INPUT_FILE = (By.ID, 'file-upload')
-    SUBMIT_BTN = (By.CSS_SELECTOR, '.css-criioj')
+    DEPOSIT_BUTTON = (By.XPATH, "//button[normalize-space()='₹ Deposit']")
+    UTR_NUMBER = (By.XPATH, "//label[text()='Enter UTR Number']/following-sibling::div//input")
+    INPUT_FILE = (By.ID, "file-upload")
+    SUBMIT_BTN = (By.XPATH, "//button//span[text()='Submit']")
     SUCCESS_MESSAGE = (By.CSS_SELECTOR, ".Toastify__toast--success")
     ERROR_MESSAGE = (By.CSS_SELECTOR, ".Toastify__toast--error")
-    SWIPER_SLIDES = (By.CLASS_NAME, "swiper-slide")
-    REFRESH_BUTTON = (By.CSS_SELECTOR, ".css-takimu")
+    REFRESH_BUTTON = (By.CSS_SELECTOR, ".css-dum73y")
     
-    DEPOSIT_AMOUNT = (By.XPATH, "//p[text()='Balance']/following-sibling::p[1]")
+    DEPOSIT_AMOUNT = (By.XPATH, "//p[text()='Balance']/following-sibling::p")
     
     def trigger_deposit_btn(self):
         #Trigger Desposit button
         self.logger.info("triggering deposit button.")
-        self.click(self.DEPOSIT_BUTTON)
+        deposit_btn = self.wait(self.DEPOSIT_BUTTON)
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", deposit_btn)
+        self.driver.execute_script("arguments[0].click();", deposit_btn)
+        # self.click(deposit_btn)
         self.logger.info("successfully triggered deposit button.")
+
+
+    def verify_campaign(self, campaign_name):
+        try:
+        
+            swiper_sliders = (By.XPATH, f"//div[contains(@class, 'swiper-slide')]//p[contains(text(), '{campaign_name}')]")
+            slide = self.wait(swiper_sliders, seconds=30)
+            self.logger.info(f"campaign founded ******************{slide}")
+            self.driver.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", slide)
+            
+            return "Campaign Founded" if slide else False
+        
+        except (WebDriverException, TimeoutException) as e:
+            self.logger.error(f"Failed to intract with deposit form: {str(e)}")
+            raise   
+    
 
     def deposit_amount(self, coupon_code, utr_number, file_path):
         try:
-            self.logger.info(f"checking Coupons {coupon_code} is available")
-
+            time.sleep(5)
             swiper_sliders = (By.XPATH, f"//div[contains(@class, 'swiper-slide')]//p[contains(text(), '{coupon_code}')]")
             slide = self.find_element(swiper_sliders)
 
-            # Find the parent swiper-slide of the coupon code
+            # Get the swiper-slide container
             parent_slide = slide.find_element(By.XPATH, "./ancestor::div[contains(@class, 'swiper-slide')]")
 
-            # Locate the "Apply Code" button within the same slide
-            apply_button = parent_slide.find_element(By.XPATH, ".//button[contains(text(), 'Apply Code')]")
-            time.sleep(2)
-            self.click(apply_button)
-            self.logger.info(f"Successfully clicked the 'Apply Code' button for coupon code {coupon_code}")
+            # Find the "Apply Code" button inside it
+            apply_button = parent_slide.find_element(By.XPATH, ".//button[.//p[text()='Apply Code']]")
+
+            self.driver.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", apply_button)
+            self.driver.execute_script("arguments[0].click();", apply_button)
+            # self.click(apply_button)
             
-            time.sleep(2)
             # Try primary locator
             self.enter_text(self.UTR_NUMBER, utr_number)
             self.logger.info(f"Successfully entered UTR number {utr_number}")
@@ -59,18 +72,19 @@ class DepositPage(BasePage):
                 self.logger.error(f"Image file not found at {file_path}")
                 return  # Stop test early if file doesn't exist
 
-            # Wait for the input field to be present in DOM
-            wait = WebDriverWait(self.driver, 10)
-            file_input = wait.until(EC.presence_of_element_located(self.INPUT_FILE))
+            file_input = self.wait(self.INPUT_FILE)
 
+            # Make sure it's not 'display: none' or hidden
+            self.driver.execute_script("""
+                arguments[0].style.display = 'block';
+                arguments[0].style.visibility = 'visible';
+                arguments[0].style.opacity = 1;
+            """, file_input)
 
-            # Unhide the file input
-            self.driver.execute_script("arguments[0].style.display = 'block';", file_input)
-            time.sleep(2)
-            # Send file path to input
+            # Upload the file
             file_input.send_keys(file_path)
+
             self.logger.info(f"Successfully uploaded image from {file_path}")
-            time.sleep(2)
 
             take_screenshots(self.driver, "deposit_page")
             # Submit the form
@@ -84,17 +98,16 @@ class DepositPage(BasePage):
     def verify_deposit(self):
         deposit_amount = None
         try:
-            time.sleep(2)
-            self.wait(self.REFRESH_BUTTON, seconds=20)
+            refresh_element = self.wait(self.REFRESH_BUTTON)
+            self.driver.execute_script("arguments[0].click();", refresh_element)
             
-            deposit_amount = self.find_element(self.DEPOSIT_AMOUNT)
-            if not deposit_amount:
-                self.logger.info("deposit element not found")
-                
-            take_screenshots(self.driver, "deposited")
-            amount = deposit_amount.text.strip()
+            deposit_amount = self.wait(self.DEPOSIT_AMOUNT)
+            
+            amount = self.driver.execute_script("return arguments[0].innerText;", deposit_amount)
+
             deposit_amount = re.sub(r'[^\d.]', '', amount)
-        
+            take_screenshots(self.driver, "deposited")
+
         except (WebDriverException, TimeoutException) as e:
             self.logger.error(f"Failed to intract with deposit form: {str(e)}")
             raise   

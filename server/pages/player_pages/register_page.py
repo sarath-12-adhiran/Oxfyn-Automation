@@ -1,6 +1,4 @@
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from pages.base_page import BasePage
 from config.config import PLAYER_BASE_URL
 from selenium.common.exceptions import WebDriverException, TimeoutException
@@ -13,32 +11,28 @@ class RegisterPage(BasePage):
         self.logger = logger
         self.driver = driver
 
-    # Modal trigger button
-    REGISTER_MODAL_BUTTON = (By.CSS_SELECTOR, ".css-1vvn66i") 
-
-    # Form field locators
-    USERNAME_FIELD = (By.NAME, "userName")
-    PASSWORD_FIELD = (By.NAME, "password")
-    CONFIRM_PASSWORD_FIELD = (By.NAME, "confirmPassword")
+    REGISTER_MODAL_BUTTON = (By.XPATH, "//button//span[text()='SIGN UP']") 
+    USERNAME_FIELD = (By.XPATH, "//div//input[@placeholder='Enter your username']")
+    PASSWORD_FIELD = (By.XPATH, "//div//input[@placeholder='Enter your password']")
+    CONFIRM_PASSWORD_FIELD = (By.XPATH, "//div//input[@placeholder='Enter your confirm password']")
     # PROMO_CODE_FIELD = (By.NAME, "promoCode")
-    COUNTRY_CODE_DROPDOWN = (By.ID, "mui-component-select-countryCode")
-    MOBILE_NUMBER_FIELD = (By.NAME, "mobile")
+    COUNTRY_CODE_DROPDOWN = (By.ID, "mui-component-select-countryId")
+    MOBILE_NUMBER_FIELD = (By.XPATH, "//div//input[@placeholder='Enter Mobile Number']")
     AGE_CHECKBOX = (By.XPATH, '//input[@name="is18Plus"]/parent::span')
-    TERMS_CHECKBOX = (By.XPATH, '//input[@name="agree"]/parent::span')
-    REGISTER_BUTTON = (By.CSS_SELECTOR, ".css-d2r5ds")
+    TERMS_CHECKBOX = (By.XPATH, '//input[@name="isTermsAndConditions"]/parent::span')
+    REGISTER_BUTTON = (By.XPATH, "//button[text()='Sign Up Now']")
     SUCCESS_MESSAGE = (By.CSS_SELECTOR, ".Toastify__toast--success")
     ERROR_MESSAGE = (By.CSS_SELECTOR, ".Toastify__toast--error")
-
-    PROFILE_BTN = (By.CSS_SELECTOR, ".css-21z1y4")
-
-    LOGOUT_BTN = (By.CSS_SELECTOR, ".css-9m9epz")
+    PROFILE_BTN = (By.XPATH, "//p[text()='Profile']/following-sibling::button")
+    LOGOUT_BTN = (By.XPATH, "//li[contains(., 'LOGOUT')]")
 
     def navigate_to_register(self):
         try:
             self.logger.info(f"Navigating to {PLAYER_BASE_URL}")
             self.driver.get(PLAYER_BASE_URL)
             self.logger.info("Attempting to trigger registration modal")
-            self.click(self.REGISTER_MODAL_BUTTON)
+            register_model = self.wait(self.REGISTER_MODAL_BUTTON)
+            self.click(register_model)
             self.logger.info("Registration modal loaded successfully")
         except (WebDriverException, TimeoutException) as e:
             self.logger.error(f"Failed to load registration modal at {PLAYER_BASE_URL}: {str(e)}")
@@ -48,32 +42,28 @@ class RegisterPage(BasePage):
         try:
             self.logger.info("Filling registration form")
             self.enter_text(self.USERNAME_FIELD, username)
-            time.sleep(2)
+            
             self.enter_text(self.PASSWORD_FIELD, password)
-            time.sleep(2)
+
             self.enter_text(self.CONFIRM_PASSWORD_FIELD, confirm_password)
             # self.enter_text(self.PROMO_CODE_FIELD, promo_code)
-            time.sleep(2)
-            # Click dropdown to open options
-            self.logger.debug("Clicking country code dropdown")
+
             self.click(self.COUNTRY_CODE_DROPDOWN)
-            # Select option by value
-            dropdown_option = (By.XPATH, f"//li[@value='{country_code}']")
+
+            dropdown_option = (By.XPATH, f"//li[text()='{country_code}']")
             self.click(dropdown_option)
-            time.sleep(2)
+
             self.enter_text(self.MOBILE_NUMBER_FIELD, mobile_number)
-            time.sleep(2)
+
             if age_confirm:
                 self.click(self.AGE_CHECKBOX)
-            time.sleep(2)
+
             if terms_agree:
                 self.click(self.TERMS_CHECKBOX)
-            time.sleep(2)
-            # Check if Register button is enabled
-            self.logger.info(f"Register button enabled: {self.find_element(self.REGISTER_BUTTON).is_enabled()}")
-            # Wait for Register button to be clickable
+           
             self.logger.info("Submitting registration form")
             take_screenshots(self.driver, "register_form")
+
             self.click(self.REGISTER_BUTTON)
 
         except (WebDriverException, TimeoutException) as e:
@@ -82,13 +72,12 @@ class RegisterPage(BasePage):
 
     def logout(self):
         try:
-            #trigger profiel button
-            time.sleep(2)
-            self.click(self.PROFILE_BTN)
-            take_screenshots(self.driver, "profile_page")
-            time.sleep(2)
+            profile_btn = self.wait(self.PROFILE_BTN)
+            self.driver.execute_script("arguments[0].scrollIntoView(true);", profile_btn)
+            self.driver.execute_script("arguments[0].click();", profile_btn)
+            # self.click(profile_btn)
             self.click(self.LOGOUT_BTN)
-        except TimeoutException as e:
+        except (WebDriverException, TimeoutException) as e:
             self.logger.error(f"Failed to logout: {str(e)}")
             raise
 

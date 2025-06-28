@@ -1,6 +1,7 @@
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
+import time 
 
 class BasePage:
     def __init__(self, driver):
@@ -15,16 +16,18 @@ class BasePage:
         element = WebDriverWait(self.driver, seconds).until(
             EC.element_to_be_clickable(locator)
         )
+        time.sleep(2)
         element.click()
 
     def wait(self, locator, seconds=10):
-        WebDriverWait(self.driver, seconds).until(
+        return WebDriverWait(self.driver, seconds).until(
             EC.presence_of_element_located(locator)
         )
         
     def enter_text(self, locator, text):
         element = self.find_element(locator)
         element.clear()
+        time.sleep(2)
         element.send_keys(text)
 
     def get_text(self, locator):
@@ -34,3 +37,5 @@ class BasePage:
         element = self.find_element(locator)
         Select(element).select_by_value(value)
     
+    def scroll(self, locator):
+        self.driver.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", locator)

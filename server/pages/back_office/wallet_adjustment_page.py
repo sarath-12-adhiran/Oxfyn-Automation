@@ -1,15 +1,13 @@
 from pages.base_page import BasePage
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from config.config import PLAYER_BASE_URL
 from selenium.common.exceptions import WebDriverException, TimeoutException
-import time
 from utils.helpers import take_screenshots
 import pandas as pd
 import openpyxl
 import os
 import re
+import time
 
 class WalletAdjustmentPage(BasePage):
     def __init__(self, driver, logger):
@@ -20,7 +18,7 @@ class WalletAdjustmentPage(BasePage):
     MASS_UPLOAD = (By.XPATH, "//button[@aria-label='Mass Adjustment']")
     UPLOAD_INPUT = (By.CSS_SELECTOR, 'input[type="file"]')
     UPLOAD_BUTTON = (By.XPATH, "//button[normalize-space()='Upload']")
-    PROFILE_BTN = (By.CSS_SELECTOR, ".css-21z1y4")
+    PROFILE_BTN = (By.XPATH, "//p[text()='Profile']/following-sibling::button")
     WALLET_BTN = (By.XPATH, '//a[@href="/wallet"]')
     MONEY = (By.XPATH, ".//div[starts-with(@class, 'MuiBox-root')]")
 
@@ -48,22 +46,21 @@ class WalletAdjustmentPage(BasePage):
             self.click(self.MASS_UPLOAD)
 
             if not os.path.exists(filepath):
-                print("excel file not found")
-            time.sleep(2)
+                self.logger.info("excel file not found")
+
             df = pd.read_excel(filepath, engine="openpyxl")
             df['playerUserName'] = pd.NA
             df['amount'] = pd.NA
             df['playerUserName'] = username
             df['amount'] = amount
 
-            df.to_excel(r"C:\Users\sujit\OneDrive\Documents\GitHub\Oxfyn-Automation\server\static\sample_file.xlsx", index=False)
-            time.sleep(2)
+            df.to_excel(filepath, index=False)
 
             self.wait(self.UPLOAD_INPUT)
             file_input = self.find_element(self.UPLOAD_INPUT)
-            time.sleep(2)
+
             file_input.send_keys(filepath)
-            time.sleep(2)
+
             self.wait(self.UPLOAD_BUTTON, seconds=30)
             self.click(self.UPLOAD_BUTTON)
         except (WebDriverException,TimeoutException) as e:
@@ -79,19 +76,20 @@ class WalletAdjustmentPage(BasePage):
         amount = []
 
         try:
-            self.click(self.PROFILE_BTN)
+            profile_btn = self.wait(self.PROFILE_BTN)
+            self.driver.execute_script("arguments[0].scrollIntoView(true);", profile_btn)
+            self.driver.execute_script("arguments[0].click();", profile_btn)
+
             self.wait(self.WALLET_BTN,seconds=30)
             self.click(self.WALLET_BTN)
 
-            time.sleep(2)
             # Find the container element first
-            container = self.driver.find_element(By.CSS_SELECTOR, ".css-f9ihvp")
+            container = self.driver.find_element(By.CSS_SELECTOR, ".css-1hiomp7")
             self.driver.execute_script("arguments[0].scrollIntoView();", container)
+
             # Find all sub-boxes with class starting with 'css-1niqfd2' or 'css-1ks1ssp'
-            time.sleep(2)
             boxes = container.find_elements(By.XPATH, ".//div[starts-with(@class, 'MuiBox-root')]")
             self.logger.info("boxes founded")
-            time.sleep(2)
 
             for i, block in enumerate(boxes):
                 para = block.find_elements(By.TAG_NAME, "p")
@@ -129,31 +127,24 @@ class WalletAdjustmentPage(BasePage):
             
             self.enter_text(self.PLAYER_NAME, player_name)
 
-            time.sleep(2)
             PLAYER_OPTION = self.find_element((By.XPATH, f"//li[text()='{player_name}']"))
             PLAYER_OPTION.click()
 
-            time.sleep(2)
             self.enter_text(self.AMOUNT, amount)
 
-            time.sleep(2)
             self.click(self.ADJUSTMENT_DROPDOWN)
 
-            time.sleep(2)
             ADJUSTMENT_TYPE = self.find_element((By.XPATH, f"//ul[@role='listbox']//li[text()='{adjustment_type}']"))
             ADJUSTMENT_TYPE.click()
 
-            time.sleep(2)
             self.click(self.WALLET_DROPDOWN)
             WALLET_TYPE = self.find_element((By.XPATH, f"//ul[@role='listbox']//li[text()='{wallet_type}']"))
             WALLET_TYPE.click()
 
-            time.sleep(2)
             self.click(self.POCKET_DROPDOWN)
             POCKET_TYPE = self.find_element((By.XPATH, f"//ul[@role='listbox']//li[text()='{pocket_type}']"))
             POCKET_TYPE.click()
 
-            time.sleep(2)
             self.wait(self.ADJUST_BUTTON)
             self.click(self.ADJUST_BUTTON)
     

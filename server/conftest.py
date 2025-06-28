@@ -5,7 +5,7 @@ import os
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
 from logging import Formatter
-from utils.helpers import generate_username, generate_mobile_number, generate_utr
+from utils.helpers import generate_username, generate_mobile_number, generate_utr, generate_campaign_code
 from selenium.common.exceptions import WebDriverException
 
 @pytest.fixture(scope="session")
@@ -15,7 +15,7 @@ def driver():
         yield driver
     except WebDriverException as e:
         logging.error("WebDriver error during test setup or execution", exc_info=True)
-        raise e  # Still raise to fail the test
+        raise e 
     finally:
         teardown_driver(driver)
 
@@ -89,7 +89,7 @@ def admin_credentials():
 
 @pytest.fixture(scope="session")
 def brand_name():
-    names = ["BET DUNIYA"]
+    names = "BET DUNIYA"
     return names
 
 @pytest.fixture(scope="session")
@@ -106,3 +106,9 @@ def lobby():
 def game_name():
     name = "Wolf Gold"
     return name
+
+@pytest.fixture(scope="session")
+def campaign_code():
+    code = generate_campaign_code()
+    return code
+

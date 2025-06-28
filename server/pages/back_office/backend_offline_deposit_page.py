@@ -4,7 +4,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from config.config import PLAYER_BASE_URL
 from selenium.common.exceptions import WebDriverException, TimeoutException
-import time
 from utils.helpers import take_screenshots
 import re
 
@@ -14,6 +13,7 @@ class BackendOfflineDepositPage(BasePage):
         self.logger = logger
 
     OFFLINE_DEPOSIT_BUTTON = (By.XPATH, "//li[a/div/div//p[text()='Offline Deposit']]")
+    OFFLINE_SEARCH = (By.XPATH, "//li[normalize-space()='Search']")
     BRAND = (By.ID, "brandIDs-autocomplete")
     USERNAME = (By.XPATH, "//label[text()='User Name']/following::input[1]")
     UTR_INPUT = (By.XPATH, "//label[text()='UTR/Tr ID']/following::input[@type='text'][1]")
@@ -38,6 +38,9 @@ class BackendOfflineDepositPage(BasePage):
         try:
             self.logger.info(f"Triggering to offile deposit button")
             self.click(self.OFFLINE_DEPOSIT_BUTTON)
+
+            self.wait(self.OFFLINE_SEARCH)
+            self.click(self.OFFLINE_SEARCH)
             self.logger.info("successfully triggred")
         except (WebDriverException, TimeoutException) as e:
             self.logger.error(f"Failed to trigger offline deposit button {str(e)}")
@@ -46,14 +49,13 @@ class BackendOfflineDepositPage(BasePage):
     def accept_income_deposit_request(self, username, utr_number, brand_name, payment_status, comment):
         success_message = None
         try:
-            time.sleep(10)
             # Locate the input field of the Autocomplete
             input_field = WebDriverWait(self.driver, 20).until(
                 EC.presence_of_element_located((By.ID, "brandIDs-autocomplete"))
             )
             input_field.click()
             input_field.send_keys("BET DUNIYA")
-            time.sleep(2)
+
             # Wait for the dropdown list to appear and locate the matching option
             option_element = WebDriverWait(self.driver, 10).until(
                 EC.element_to_be_clickable(
@@ -63,10 +65,8 @@ class BackendOfflineDepositPage(BasePage):
 
             # Click the option to select it
             option_element.click()
-            time.sleep(2)
 
             self.enter_text(self.UTR_INPUT, utr_number)
-            time.sleep(2)
 
             input_box = WebDriverWait(self.driver, 10).until(
                 EC.element_to_be_clickable((By.NAME, "userName"))
@@ -91,7 +91,7 @@ class BackendOfflineDepositPage(BasePage):
                 self.click(get_options)
             
             take_screenshots(self.driver, "offline_deposit_search_form")
-            time.sleep(2)
+
             # trigger search button
             self.click(self.SEARCH_BUTTON)
 
@@ -122,29 +122,32 @@ class BackendOfflineDepositPage(BasePage):
                         break
                     raise
             
-            time.sleep(2)
             self.wait(self.COMMENT)
             #comment
             self.enter_text(self.COMMENT, comment)
             self.logger.info("successfully entered comment")
 
-            time.sleep(2)
             self.wait(self.APPROVE, seconds=20)
-            element=self.find_element(self.APPROVE)
-            self.driver.execute_script("arguments[0].scrollIntoView();", element)
+            approve_element=self.find_element(self.APPROVE)
+            if not approve_element:
+                self.logger.info("approve radio button not found")
+
+            self.driver.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", approve_element)
+            self.driver.execute_script("arguments[0].click();", approve_element)
             #approve or reject
-            self.click(self.APPROVE)
+            # self.click(self.APPROVE)
             self.logger.info("successfully check the approved")        
             
-            time.sleep(2)
             self.wait(self.UPDATE_BUTTON, seconds=20)
-            element=self.find_element(self.UPDATE_BUTTON)
-            self.driver.execute_script("arguments[0].scrollIntoView();", element)
+            update_element=self.find_element(self.UPDATE_BUTTON)
+            if not update_element:
+                self.logger.info("update button not found")
+            self.driver.execute_script("arguments[0].scrollIntoView();", update_element)
+            self.driver.execute_script("arguments[0].click();", update_element)
             take_screenshots(self.driver, "offline_deposit_approve")
             #update
-            self.click(self.UPDATE_BUTTON)
+            # self.click(self.UPDATE_BUTTON)
 
-            time.sleep(2)
             self.wait(self.DIALOG_BOX, seconds=30)
             # success_message = self.get_text(self.DIALOG_MESSAGE)
             take_screenshots(self.driver, f"Deposit Approved Successfully")
@@ -156,11 +159,9 @@ class BackendOfflineDepositPage(BasePage):
 
     def logout(self):
         try:
-            time.sleep(2)
             self.wait(self.PROFILE)
             self.click(self.PROFILE)
             take_screenshots(self.driver, "backend_profile_page")
-            time.sleep(2)
             self.click(self.LOGOUT_BUTTON)
         except (WebDriverException, TimeoutException) as e:
             self.logger.error(f"error to logout: {str(e)}")

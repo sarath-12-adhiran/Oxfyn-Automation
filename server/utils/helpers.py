@@ -3,7 +3,6 @@ import string
 import os
 from datetime import date
 
-
 def generate_username(length=4):
     random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=length))
     return f'Atester{random_string}'
@@ -27,3 +26,11 @@ def take_screenshots(driver, filename):
     driver.save_screenshot(f"screenshots/{today_date}_{filename}.png")
 
 
+def generate_campaign_code(length=3):
+    random_string = ''.join(random.choices(string.digits, k=length))
+    return f'AUTO-{random_string}'
+
+
+def BASE_DIR(filename):
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base_dir, "static", filename)
