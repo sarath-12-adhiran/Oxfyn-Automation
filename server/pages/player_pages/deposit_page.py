@@ -36,10 +36,10 @@ class DepositPage(BasePage):
         try:
         
             swiper_sliders = (By.XPATH, f"//div[contains(@class, 'swiper-slide')]//p[contains(text(), '{campaign_name}')]")
-            slide = self.wait(swiper_sliders, seconds=30)
+            slide = self.wait(swiper_sliders)
             self.logger.info(f"campaign founded ******************{slide}")
             self.driver.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", slide)
-            
+            time.sleep(5)
             return "Campaign Founded" if slide else False
         
         except (WebDriverException, TimeoutException) as e:
@@ -101,6 +101,7 @@ class DepositPage(BasePage):
             refresh_element = self.wait(self.REFRESH_BUTTON)
             self.driver.execute_script("arguments[0].click();", refresh_element)
             
+            time.sleep(5)
             deposit_amount = self.wait(self.DEPOSIT_AMOUNT)
             
             amount = self.driver.execute_script("return arguments[0].innerText;", deposit_amount)

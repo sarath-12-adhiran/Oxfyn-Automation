@@ -6,10 +6,10 @@ from pages.player_pages.login_page import LoginPage
 from pages.player_pages.deposit_page import DepositPage
 from pages.back_office.backend_offline_deposit_page import BackendOfflineDepositPage
 from pages.player_pages.register_page import RegisterPage
-
+from utils.helpers import BASE_DIR
 
 class TestDeposit:
-
+    
     def test_register(self, driver, logger, user_credentials):
         register_page = RegisterPage(driver, logger)
         try:
@@ -78,12 +78,13 @@ class TestDeposit:
             logger.error(f"Test failed: {str(e)}")
             pytest.fail(f"Test failed due to: {str(e)}")
 
-    def test_deposit(self, driver, logger, coupon_code, utr_number, file_screenshot):
+    def test_deposit(self, driver, logger, coupon_code, utr_number):
         deposit_page = DepositPage(driver, logger)
         try:
             logger.info("Starting test_successful_deposit")
             deposit_page.trigger_deposit_btn()
-            deposit_page.deposit_amount(coupon_code,utr_number['UTR'],file_screenshot)
+            file_path = BASE_DIR("prof.png")
+            deposit_page.deposit_amount(coupon_code,utr_number['UTR'], file_path)
             logger.info(f"closing deposit feature")
 
             success_msg = deposit_page.get_success_message()

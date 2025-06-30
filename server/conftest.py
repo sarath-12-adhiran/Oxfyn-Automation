@@ -76,11 +76,6 @@ def coupon_code():
 
 
 @pytest.fixture(scope="session")
-def file_screenshot():
-    file_path = r"C:\Users\sujit\OneDrive\Documents\GitHub\Oxfyn-Automation\server\static\prof.png"
-    return file_path
-
-@pytest.fixture(scope="session")
 def admin_credentials():
     username = "Superadmin"
     password = "Password@123"  

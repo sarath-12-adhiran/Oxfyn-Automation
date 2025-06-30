@@ -32,7 +32,7 @@ class BackendLoginPage(BasePage):
         
         try:
             #assigning values
-
+    
             self.enter_text(self.USERNAME, username)
             self.enter_text(self.PASSWORD, password)
             # Wait for login button to be clickable

@@ -2,6 +2,8 @@ import random
 import string
 import os
 from datetime import date
+import time
+
 
 def generate_username(length=4):
     random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=length))
@@ -34,3 +36,17 @@ def generate_campaign_code(length=3):
 def BASE_DIR(filename):
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     return os.path.join(base_dir, "static", filename)
+
+def retry(times, delay=2):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            for i in range(times):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    print(f"Retry {i+1}/{times} failed: {e}")
+                    time.sleep(delay)
+            raise Exception("All retries failed.")
+        return wrapper
+    return decorator
+

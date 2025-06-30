@@ -32,6 +32,7 @@ class WalletAdjustmentPage(BasePage):
     ADJUST_BUTTON = (By.XPATH, "//button[normalize-space()='Adjust']")
     SUCCESS_MESSAGE = (By.CSS_SELECTOR, ".Toastify__toast--success")
     ERROR_MESSAGE = (By.CSS_SELECTOR, ".Toastify__toast--error")
+
     def click_wallet_adjustment_button(self):
         try:
             if not self.find_element(self.WALLET_ADJUSTMENT):
@@ -61,7 +62,7 @@ class WalletAdjustmentPage(BasePage):
 
             file_input.send_keys(filepath)
 
-            self.wait(self.UPLOAD_BUTTON, seconds=30)
+            upload_button = self.wait(self.UPLOAD_BUTTON)
             self.click(self.UPLOAD_BUTTON)
         except (WebDriverException,TimeoutException) as e:
             self.logger.error(f"some error occured: {str(e)}")
@@ -80,14 +81,13 @@ class WalletAdjustmentPage(BasePage):
             self.driver.execute_script("arguments[0].scrollIntoView(true);", profile_btn)
             self.driver.execute_script("arguments[0].click();", profile_btn)
 
-            self.wait(self.WALLET_BTN,seconds=30)
+            self.wait(self.WALLET_BTN)
             self.click(self.WALLET_BTN)
 
             # Find the container element first
             container = self.driver.find_element(By.CSS_SELECTOR, ".css-1hiomp7")
-            self.driver.execute_script("arguments[0].scrollIntoView();", container)
+            self.driver.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", container)
 
-            # Find all sub-boxes with class starting with 'css-1niqfd2' or 'css-1ks1ssp'
             boxes = container.find_elements(By.XPATH, ".//div[starts-with(@class, 'MuiBox-root')]")
             self.logger.info("boxes founded")
 
@@ -106,7 +106,7 @@ class WalletAdjustmentPage(BasePage):
                     # Remove currency symbol and commas (e.g., ₹1,000.00 -> 1000.00)
                     value = re.sub(r'[^\d.]', '', value_text)
 
-                    # self.logger.info(f"[{i}] Extracted -> label: {label}, raw value: {value_text}, cleaned value: {value}")
+                    self.logger.info(f"[{i}] Extracted -> label: {label}, raw value: {value_text}, cleaned value: {value}")
                     amount.append({"label": label, "value": value})
                     take_screenshots(self.driver, f"wallet")
                 except Exception as e:

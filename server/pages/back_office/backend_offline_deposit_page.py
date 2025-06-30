@@ -6,6 +6,7 @@ from config.config import PLAYER_BASE_URL
 from selenium.common.exceptions import WebDriverException, TimeoutException
 from utils.helpers import take_screenshots
 import re
+import time 
 
 class BackendOfflineDepositPage(BasePage):
     def __init__(self, driver, logger):
@@ -49,6 +50,7 @@ class BackendOfflineDepositPage(BasePage):
     def accept_income_deposit_request(self, username, utr_number, brand_name, payment_status, comment):
         success_message = None
         try:
+            time.sleep(10)
             # Locate the input field of the Autocomplete
             input_field = WebDriverWait(self.driver, 20).until(
                 EC.presence_of_element_located((By.ID, "brandIDs-autocomplete"))
@@ -108,7 +110,9 @@ class BackendOfflineDepositPage(BasePage):
                     if username_element.text.strip() == username:
                         self.logger.info(f"Username found: {username_element.text}")
                         show_button = current_row.find_element(By.XPATH, ".//td[last()]//button[normalize-space()='Show']")
-                        show_button.click()
+                        self.driver.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", show_button)
+                        self.driver.execute_script("arguments[0].click();", show_button)
+                        # show_button.click()
                         self.logger.info("successfully triggered show button")
                         break
                     i += 1
@@ -197,3 +201,4 @@ class BackendOfflineDepositPage(BasePage):
         except (WebDriverException,TimeoutException) as e:
             self.logger.error(f"unable to get error message: {str(e)}")
             raise
+

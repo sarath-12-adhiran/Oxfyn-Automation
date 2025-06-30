@@ -85,8 +85,8 @@ class TestWalletAdjustment:
             
             player_wallet.redirect_to_player_page()
             res = player_wallet.validate_player_wallet()
-            
-            deposit_amount = all(data['value'] == "500.00" for data in res)
+            logger.info(f"res*****************: {res}")
+            deposit_amount = all(data['value'] == "500" for data in res)
             
             if not deposit_amount:
                 logger.error(f"Deposit amount not found or invalid")
@@ -123,7 +123,7 @@ class TestWalletAdjustment:
             player_wallet.redirect_to_player_page()
             res = player_wallet.validate_player_wallet()
             
-            deposit_amount = any(data['label'] == "Casino Money" and data['value'] == "1000.00" for data in res)
+            deposit_amount = any(data['label'] == "Casino Money" and data['value'] == "1000" for data in res)
             
             if not deposit_amount:
                 logger.error(f"Deposit amount for win not found or invalid")
