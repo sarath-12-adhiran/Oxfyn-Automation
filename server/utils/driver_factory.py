@@ -5,11 +5,12 @@ from config.config import IMPLICIT_WAIT
 
 def setup_driver():
     options = webdriver.ChromeOptions()
-    # options.add_argument("--incognito")
-    options.add_argument("--ignore-certificate-errors")  # Bypass SSL errors
-    options.add_argument("--disable-web-security")      # Disable web security for testing
-    options.add_argument("--allow-running-insecure-content")  # Allow insecure content
-    # options.add_argument("--headless")  # Uncomment for headless mode if needed
+    options.add_argument("--ignore-certificate-errors")
+    options.add_argument("--disable-web-security")
+    options.add_argument("--allow-running-insecure-content")
+    options.add_experimental_option("excludeSwitches", ["enable-logging"])  
+    options.add_argument("--log-level=3")
+
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     driver.implicitly_wait(IMPLICIT_WAIT)
     driver.maximize_window()
@@ -17,4 +18,7 @@ def setup_driver():
 
 def teardown_driver(driver):
     if driver:
+        driver.delete_all_cookies()
+        driver.execute_script("window.localStorage.clear();")
+        driver.execute_script("window.sessionStorage.clear();")
         driver.quit()

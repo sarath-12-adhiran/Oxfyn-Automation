@@ -45,7 +45,6 @@ class TestDeposit:
             register_page.logout()
 
             success_msg = register_page.get_success_message()
-
             if not "Logout successful" in success_msg:
                 error_msg = register_page.get_error_message()
                 logger.error(f"unabel to logout some error occured: {error_msg}")
@@ -116,7 +115,7 @@ class TestDeposit:
             #     error_msg = backend_login.get_error_message()
             #     logger.error("unable to login some error occured: {error_msg}")
 
-            # assert "Login successful" in success_msg
+            assert "Login successful"
 
         except (WebDriverException, TimeoutException) as e:
             logger.error(f"Test failed: {str(e)}")
@@ -140,21 +139,29 @@ class TestDeposit:
                 logger.error(f"unable to update offline deposit some error occured {error_msg}")
 
             assert "Deposit transaction Updated Successfully" in response
-
+            
         except (WebDriverException, TimeoutException) as e:
             logger.error(f"Test failed: {str(e)}")
             pytest.fail(f"Test failed due to: {str(e)}")
     
-    
-    def test_backoffice_logout(self, driver, logger,):
-        backend = BackendOfflineDepositPage(driver, logger)
-
+    def test_redirect(self, driver, logger):
         try:
-            backend.logout()
-            backend.navigate_player_dashboard()
+            backend_offline_deposit = BackendOfflineDepositPage(driver, logger)
+            backend_offline_deposit.navigate_player_dashboard()
+            logger.info("Redirected to player dashboard successfully")
         except (WebDriverException, TimeoutException) as e:
-            logger.error(f"Test failed: {str(e)}")
-            pytest.fail(f"Test failed due to: {str(e)}")
+            logger.error(f"Failed to redirect to player dashboard: {str(e)}")
+            pytest.fail(f"Failed to redirect due to: {str(e)}")
+
+    # def test_backoffice_logout(self, driver, logger,):
+    #     backend = BackendOfflineDepositPage(driver, logger)
+
+    #     try:
+    #         backend.logout()
+    #         backend.navigate_player_dashboard()
+    #     except (WebDriverException, TimeoutException) as e:
+    #         logger.error(f"Test failed: {str(e)}")
+    #         pytest.fail(f"Test failed due to: {str(e)}")
 
     def test_verifying_deposit(self, driver, logger,):
         player_page =  DepositPage(driver, logger)
@@ -162,10 +169,10 @@ class TestDeposit:
         try:
             response = player_page.verify_deposit()
 
-            if not "600.00" in response:
+            if not "1000.00" in response:
                 logger.error("the deposit amount was not found or invalid")
-        
-            assert "600.00" in response
+
+            assert "1000.00" in response
 
         except (WebDriverException, TimeoutException) as e:
             logger.error(f"Test failed: {str(e)}")

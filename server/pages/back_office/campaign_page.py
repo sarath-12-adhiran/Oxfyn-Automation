@@ -13,8 +13,7 @@ class CampaignPage(BasePage):
         self.driver = driver
         self.logger = logger
 
-    CAMPAIGN = (By.XPATH, "//li[a/div/div//p[text()='Campaign']]")
-    
+    CAMPAIGN = (By.XPATH, "/html/body/div[1]/nav/div/div/div/div/ul/li[16]/a")
     CREATE_BUTTON = (By.XPATH, "//button[text()='Create']")
     BRAND_DROPDOWN = (By.XPATH, "//div[@id='reportingHirearchyUserId']")
     CAMPAIGN_TYPE_DROPDOWN = (By.ID, "mui-component-select-campaignType")
@@ -43,9 +42,11 @@ class CampaignPage(BasePage):
 
     def navigate_to_campaign(self):
         try:
-            self.click(self.CAMPAIGN)
+            camp_btn = self.wait(self.CAMPAIGN)
+            self.driver.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", camp_btn)
+            self.driver.execute_script("arguments[0].click();", camp_btn)
         except (WebDriverException, TimeoutException) as e:
-            self.logger.error("")
+            self.logger.error(f"Error navigating to campaign: {str(e)}")
             raise
 
     def create_campaign(self, brand_name, campaign_type, vertical_name, bonus_type, max_redeem, deposit_type, campaign_name, bonus, expiry_count, active_status, min_deposit, campaign_code, turnover, max_bonus, date_range, bonus_amount, start_date, end_date):

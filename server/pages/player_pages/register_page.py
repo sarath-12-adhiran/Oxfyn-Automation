@@ -25,6 +25,7 @@ class RegisterPage(BasePage):
     ERROR_MESSAGE = (By.CSS_SELECTOR, ".Toastify__toast--error")
     PROFILE_BTN = (By.XPATH, "//p[text()='Profile']/following-sibling::button")
     LOGOUT_BTN = (By.XPATH, "//li[contains(., 'LOGOUT')]")
+    SEARCH_COUNTRUY = (By.XPATH, "//input[@placeholder='Search country']")
 
     def navigate_to_register(self):
         try:
@@ -49,7 +50,7 @@ class RegisterPage(BasePage):
             # self.enter_text(self.PROMO_CODE_FIELD, promo_code)
 
             self.click(self.COUNTRY_CODE_DROPDOWN)
-
+            self.enter_text(self.SEARCH_COUNTRUY, country_code)
             dropdown_option = (By.XPATH, f"//li[text()='{country_code}']")
             self.click(dropdown_option)
 
@@ -83,7 +84,7 @@ class RegisterPage(BasePage):
 
     def get_success_message(self):
         try:
-            msg = self.get_text(self.SUCCESS_MESSAGE)
+            msg = self.find_element(self.SUCCESS_MESSAGE).text
             take_screenshots(self.driver, f"{msg}")
             self.logger.info(f"Success message: {msg}")
             return msg
@@ -93,7 +94,7 @@ class RegisterPage(BasePage):
 
     def get_error_message(self):
         try:
-            msg = self.get_text(self.ERROR_MESSAGE)
+            msg = self.find_element(self.ERROR_MESSAGE).text
             take_screenshots(self.driver, f"{msg}")
             self.logger.info(f"Error message: {msg}")
             return msg

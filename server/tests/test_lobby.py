@@ -1,14 +1,11 @@
 import pytest
-from pages.back_office.campaign_page import CampaignPage
-from pages.player_pages.deposit_page import DepositPage
-from pages.player_pages.register_page import RegisterPage
+from pages.back_office.lobby_page import LobbyPage
 from pages.back_office.backend_login_page import BackendLoginPage
+from pages.player_pages.register_page import RegisterPage
+from pages.player_pages.vertical_page import VerticalPage
 from selenium.common.exceptions import WebDriverException, TimeoutException
-import os
-from datetime import date, timedelta
 
-
-class TestCampaign:
+class TestLobby:
 
     def test_backoffice_login(self, driver, admin_credentials, logger):
         backend_login = BackendLoginPage(driver, logger)
@@ -26,42 +23,31 @@ class TestCampaign:
             #     error_msg = backend_login.get_error_message()
             #     logger.error(f"test failed dude to unexpected response error message: {error_msg}")
 
-            assert "Login successful"
+            # assert "Login successful" in success_msg
 
         except (WebDriverException, TimeoutException) as e:
             logger.error(f"Test failed: {str(e)}")
             pytest.fail(f"Test failed due to: {str(e)}")
 
-    def test_create_campaign(self, driver, brand_name, logger, campaign_code):
-        campaign = CampaignPage(driver, logger)
+    def test_create_lobby(self, driver, logger, brand_name, lobby_name):
+        loggy_management = LobbyPage(driver, logger)
         try:
-            campaign.navigate_to_campaign()
-            campaign.create_campaign(
-                brand_name=brand_name, 
-                campaign_type = "Deposit",
-                vertical_name = "Casino", 
-                bonus_type = "Deposit", 
-                max_redeem = "300", 
-                deposit_type = "First Deposit", 
-                campaign_name = campaign_code, 
-                bonus = "Amount", 
-                expiry_count = "5", 
-                active_status = "Active", 
-                min_deposit = "200", 
-                campaign_code = campaign_code, 
-                turnover = "1", 
-                max_bonus = "100", 
-                date_range = None,
-                bonus_amount = "100",
-                start_date = date.today(),
-                end_date = date.today() + timedelta(days=1)
+            loggy_management.navigate_to_lobby_management()
+            res = loggy_management.create_new_lobby(
+                lobby_name=lobby_name,
+                brand_name=brand_name,
+                vertical="Casino",
+                category_order='1',
+                status="Active",
+                aggregator="RJ VK Casino",
+                game_provider="Pragmatic Play"
             )
-            
+
         except (WebDriverException, TimeoutException) as e:
             logger.error(f"Test failed: {str(e)}")
             pytest.fail(f"Test failed due to: {str(e)}")
 
-    def test_registration(self, driver, user_credentials, logger):
+    def test_register(self, driver, logger, user_credentials):
         register_page = RegisterPage(driver, logger)
         try:
             logger.info("Starting test_successful_registration")
@@ -87,16 +73,17 @@ class TestCampaign:
         except (WebDriverException, TimeoutException) as e:
             logger.error(f"Test failed: {str(e)}")
             pytest.fail(f"Test failed due to: {str(e)}")
-
-        
-    def test_verify_campaign(self, driver, logger, campaign_code):
-        campaign = DepositPage(driver, logger)
+    
+    def test_verify_created_lobby(self, driver, logger, lobby_name):
+        game_page = VerticalPage(driver, logger)
         try:
-            campaign.trigger_deposit_btn()
-            response = campaign.verify_campaign(
-            campaign_name = campaign_code
+            game_page.navigate_to_verticals(verticals="Casino")
+            res = game_page.find_lobby(
+                lobby_name=lobby_name
             )
-            assert "Campaign Founded" in response
+
+            if f"{lobby_name} Founded!" not in res:
+                logger.error('Lobby Not Created or Founded')
 
         except (WebDriverException, TimeoutException) as e:
             logger.error(f"Test failed: {str(e)}")

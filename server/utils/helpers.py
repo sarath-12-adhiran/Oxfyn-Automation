@@ -50,3 +50,7 @@ def retry(times, delay=2):
         return wrapper
     return decorator
 
+def generate_lobby_name():
+    random_string = ''.join(random.choices(string.digits, k=3))
+    return f'Lobby-{random_string}'
+

@@ -49,12 +49,16 @@ class DepositPage(BasePage):
 
     def deposit_amount(self, coupon_code, utr_number, file_path):
         try:
-            time.sleep(5)
             swiper_sliders = (By.XPATH, f"//div[contains(@class, 'swiper-slide')]//p[contains(text(), '{coupon_code}')]")
-            slide = self.find_element(swiper_sliders)
+            slide = self.wait(swiper_sliders)
+            self.logger.info(f"****************8888ddsf {slide}")
+            if not slide:
+                self.logger.error("slider element not found*************")
 
+            self.driver.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", slide)
             # Get the swiper-slide container
             parent_slide = slide.find_element(By.XPATH, "./ancestor::div[contains(@class, 'swiper-slide')]")
+
 
             # Find the "Apply Code" button inside it
             apply_button = parent_slide.find_element(By.XPATH, ".//button[.//p[text()='Apply Code']]")

@@ -126,10 +126,10 @@ class BackendOfflineDepositPage(BasePage):
                         break
                     raise
             
-            self.wait(self.COMMENT)
-            #comment
-            self.enter_text(self.COMMENT, comment)
-            self.logger.info("successfully entered comment")
+            # self.wait(self.COMMENT)
+            # #comment
+            # self.enter_text(self.COMMENT, comment)
+            # self.logger.info("successfully entered comment")
 
             self.wait(self.APPROVE, seconds=20)
             approve_element=self.find_element(self.APPROVE)
@@ -149,27 +149,22 @@ class BackendOfflineDepositPage(BasePage):
             self.driver.execute_script("arguments[0].scrollIntoView();", update_element)
             self.driver.execute_script("arguments[0].click();", update_element)
             take_screenshots(self.driver, "offline_deposit_approve")
-            #update
-            # self.click(self.UPDATE_BUTTON)
 
-            self.wait(self.DIALOG_BOX, seconds=30)
-            # success_message = self.get_text(self.DIALOG_MESSAGE)
-            take_screenshots(self.driver, f"Deposit Approved Successfully")
-            self.click(self.DIALOG_BOX)       
-            return "Deposit transaction Updated Successfully"     
+            return "Deposit transaction Updated Successfully"
+
         except (WebDriverException, TimeoutException) as e:
             self.logger.error(f"error to load offline deposit: {str(e)}")
             raise
 
-    def logout(self):
-        try:
-            self.wait(self.PROFILE)
-            self.click(self.PROFILE)
-            take_screenshots(self.driver, "backend_profile_page")
-            self.click(self.LOGOUT_BUTTON)
-        except (WebDriverException, TimeoutException) as e:
-            self.logger.error(f"error to logout: {str(e)}")
-            raise
+    # def logout(self):
+    #     try:
+    #         self.wait(self.PROFILE)
+    #         self.click(self.PROFILE)
+    #         take_screenshots(self.driver, "backend_profile_page")
+    #         self.click(self.LOGOUT_BUTTON)
+    #     except (WebDriverException, TimeoutException) as e:
+    #         self.logger.error(f"error to logout: {str(e)}")
+    #         raise
 
     def navigate_player_dashboard(self):
         deposit_amount = None

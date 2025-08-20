@@ -16,7 +16,7 @@ class BasePage:
         element = WebDriverWait(self.driver, seconds).until(
             EC.element_to_be_clickable(locator)
         )
-        time.sleep(2)
+        # time.sleep(2)
         element.click()
 
     def wait(self, locator, seconds=10):
@@ -27,7 +27,7 @@ class BasePage:
     def enter_text(self, locator, text):
         element = self.find_element(locator)
         element.clear()
-        time.sleep(2)
+        # time.sleep(2)
         element.send_keys(text)
 
     def get_text(self, locator):
