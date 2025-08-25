@@ -14,7 +14,7 @@ class BackendLoginPage(BasePage):
 
     USERNAME = (By.CSS_SELECTOR, '.css-sydhbg')
     PASSWORD = (By.CSS_SELECTOR, '.css-1yxkpls')
-    LOGIN_BUTTON = (By.CSS_SELECTOR, '.css-1nc1bkw')
+    LOGIN_BUTTON =  (By.XPATH, '//button[@type="submit"]')
     SUCCESS_MESSAGE = (By.CSS_SELECTOR, ".Toastify__toast--success")
     ERROR_MESSAGE = (By.CSS_SELECTOR, ".Toastify__toast--error")
 

@@ -23,7 +23,8 @@ class BasePage:
         return WebDriverWait(self.driver, seconds).until(
             EC.presence_of_element_located(locator)
         )
-        
+    
+
     def enter_text(self, locator, text):
         element = self.find_element(locator)
         element.clear()

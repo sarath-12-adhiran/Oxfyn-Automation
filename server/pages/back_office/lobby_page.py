@@ -28,8 +28,10 @@ class LobbyPage(BasePage):
     GAME_SEARCH = (By.XPATH, "//button[normalize-space()='Search']")
     UNASSIGNED_GAMES = (By.XPATH, "//div//h6[contains(text(), 'Unassigned Games - ')]")
     FIRST_FIVE_ITEMS = (By.XPATH, "//div//li[@role='menuitem']//div[position()=1]")
-    ASSIGN_BUTTON = (By.CSS_SELECTOR, ".css-120acwp")
+    ASSIGN_BUTTON = (By.XPATH, "/html/body/div[1]/div[2]/div[2]/div[1]/div/div/form/div[3]/div[2]/div[2]/div/button[1]")
     SAVE_BTN = (By.XPATH, "//button[text()='Save']")
+
+    
 
 
     def navigate_to_lobby_management(self):

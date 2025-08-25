@@ -35,7 +35,7 @@ class DepositPage(BasePage):
     def verify_campaign(self, campaign_name):
         try:
         
-            swiper_sliders = (By.XPATH, f"//div[contains(@class, 'swiper-slide')]//p[contains(text(), '{campaign_name}')]")
+            swiper_sliders = (By.XPATH, f"//div[contains(@class, 'swiper-slide')]//span[contains(text(), '{campaign_name}')]")
             slide = self.wait(swiper_sliders)
             self.logger.info(f"campaign founded ******************{slide}")
             self.driver.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", slide)
@@ -49,7 +49,7 @@ class DepositPage(BasePage):
 
     def deposit_amount(self, coupon_code, utr_number, file_path):
         try:
-            swiper_sliders = (By.XPATH, f"//div[contains(@class, 'swiper-slide')]//p[contains(text(), '{coupon_code}')]")
+            swiper_sliders = (By.XPATH, f"//div[contains(@class, 'swiper-slide')]//span[contains(text(), '{coupon_code}')]")
             slide = self.wait(swiper_sliders)
             self.logger.info(f"****************8888ddsf {slide}")
             if not slide:
@@ -61,7 +61,7 @@ class DepositPage(BasePage):
 
 
             # Find the "Apply Code" button inside it
-            apply_button = parent_slide.find_element(By.XPATH, ".//button[.//p[text()='Apply Code']]")
+            apply_button = parent_slide.find_element(By.XPATH, "//button[contains(text(),'Apply Code')]")
 
             self.driver.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", apply_button)
             self.driver.execute_script("arguments[0].click();", apply_button)
@@ -97,7 +97,7 @@ class DepositPage(BasePage):
             #enter utr number
         except (WebDriverException, TimeoutException) as e:
             self.logger.error(f"Failed to intract with deposit form: {str(e)}")
-            raise   
+            raise  
     
     def verify_deposit(self):
         deposit_amount = None

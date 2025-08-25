@@ -5,7 +5,7 @@ import os
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
 from logging import Formatter
-from utils.helpers import generate_username, generate_mobile_number, generate_utr, generate_campaign_code, generate_lobby_name
+from utils.helpers import generate_username, generate_mobile_number, generate_utr, generate_campaign_code, generate_lobby_name, generate_account_number
 from selenium.common.exceptions import WebDriverException
 
 @pytest.fixture(scope="session")
@@ -71,7 +71,7 @@ def utr_number():
 
 @pytest.fixture(scope="session")
 def coupon_code():
-    code = "CQTY"
+    code = "FDPBNEXPIRY"
     return code
 
 
@@ -111,3 +111,7 @@ def campaign_code():
 def lobby_name():
     name = generate_lobby_name()
     return name
+
+@pytest.fixture(scope="session")
+def account_number():
+    return generate_account_number()

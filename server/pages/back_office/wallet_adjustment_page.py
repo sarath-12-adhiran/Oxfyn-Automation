@@ -88,11 +88,11 @@ class WalletAdjustmentPage(BasePage):
             container = self.driver.find_element(By.CSS_SELECTOR, ".css-1hiomp7")
             self.driver.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", container)
 
-            boxes = container.find_elements(By.XPATH, ".//div[starts-with(@class, 'MuiBox-root')]")
+            boxes = container.find_elements(By.XPATH, ".//div[contains(@class, 'MuiPaper-root')]")
             self.logger.info("boxes founded")
 
             for i, block in enumerate(boxes):
-                para = block.find_elements(By.TAG_NAME, "p")
+                para = block.find_elements(By.TAG_NAME, "span")
                 self.logger.info(f"[{i}] paragraph count: {len(para)}")
 
                 if len(para) < 2:
@@ -126,7 +126,7 @@ class WalletAdjustmentPage(BasePage):
             BRAND_TYPE.click()
             
             self.enter_text(self.PLAYER_NAME, player_name)
-
+            time.sleep(15)
             PLAYER_OPTION = self.find_element((By.XPATH, f"//li[text()='{player_name}']"))
             PLAYER_OPTION.click()
 

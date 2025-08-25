@@ -39,7 +39,7 @@ class TestLobby:
                 vertical="Casino",
                 category_order='1',
                 status="Active",
-                aggregator="RJ VK Casino",
+                aggregator="PP Clone",
                 game_provider="Pragmatic Play"
             )
 

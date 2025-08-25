@@ -32,6 +32,8 @@ def generate_campaign_code(length=3):
     random_string = ''.join(random.choices(string.digits, k=length))
     return f'AUTO-{random_string}'
 
+def generate_account_number(length=12):
+    return ''.join(random.choices(string.digits, k=length))
 
 def BASE_DIR(filename):
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

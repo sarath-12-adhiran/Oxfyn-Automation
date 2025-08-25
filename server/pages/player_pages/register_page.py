@@ -15,7 +15,6 @@ class RegisterPage(BasePage):
     USERNAME_FIELD = (By.XPATH, "//div//input[@placeholder='Enter your username']")
     PASSWORD_FIELD = (By.XPATH, "//div//input[@placeholder='Enter your password']")
     CONFIRM_PASSWORD_FIELD = (By.XPATH, "//div//input[@placeholder='Enter your confirm password']")
-    # PROMO_CODE_FIELD = (By.NAME, "promoCode")
     COUNTRY_CODE_DROPDOWN = (By.ID, "mui-component-select-countryId")
     MOBILE_NUMBER_FIELD = (By.XPATH, "//div//input[@placeholder='Enter Mobile Number']")
     AGE_CHECKBOX = (By.XPATH, '//input[@name="is18Plus"]/parent::span')
@@ -78,6 +77,7 @@ class RegisterPage(BasePage):
             self.driver.execute_script("arguments[0].click();", profile_btn)
             # self.click(profile_btn)
             self.click(self.LOGOUT_BTN)
+            return True
         except (WebDriverException, TimeoutException) as e:
             self.logger.error(f"Failed to logout: {str(e)}")
             raise
